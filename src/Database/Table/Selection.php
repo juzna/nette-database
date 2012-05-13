@@ -520,7 +520,12 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 
 	protected function createRow(array $row)
 	{
-		return new ActiveRow($row, $this);
+		if ($factory = $this->context->getRowFactory()) {
+			return $factory->createRow($row, $this);
+
+		} else {
+			return new ActiveRow($row, $this);
+		}
 	}
 
 

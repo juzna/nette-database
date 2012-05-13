@@ -30,6 +30,9 @@ class Context extends Nette\Object
 	/** @var Nette\Caching\IStorage */
 	private $cacheStorage;
 
+	/** @var IRowFactory */
+	private $rowFactory;
+
 
 	public function __construct(Connection $connection, IStructure $structure, IConventions $conventions = NULL, Nette\Caching\IStorage $cacheStorage = NULL)
 	{
@@ -132,6 +135,20 @@ class Context extends Nette\Object
 		return $this->conventions;
 	}
 
+
+	public function setRowFactory(IRowFactory $rowFactory)
+	{
+		$this->rowFactory = $rowFactory;
+	}
+
+
+	/**
+	 * @return IRowFactory
+	 */
+	public function getRowFactory()
+	{
+		return $this->rowFactory;
+	}
 
 	/********************* shortcuts ****************d*g**/
 
