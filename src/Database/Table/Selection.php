@@ -1004,4 +1004,46 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 		unset($this->rows[$key], $this->data[$key]);
 	}
 
+
+	/**
+	 * Fetch single value
+	 */
+	public function fetchSingle()
+	{
+		$this->execute();
+		$row = reset($this->data);
+		if ($row) {
+			$tmp = array_values($row->toArray());
+			return $tmp[0];
+		} else {
+			return null;
+		}
+	}
+
+
+	/**
+	 * Fetch only the first column
+	 * @param int|string $col Column offset or name
+	 * @return array
+	 */
+	public function fetchColumn($col = 0) {
+		$result = array();
+		foreach ($this as $row) {
+			$tmp = $row->toArray();
+			if (is_numeric($col)) $tmp = array_values($tmp);
+			$result[] = $tmp[$col];
+		}
+		return $result;
+	}
+
+
+	/**
+	 * Convenient method to fetch all rows indexed by a column (or a primary key)
+	 * @param string $key
+	 * @return ActiveRow[]
+	 */
+	public function fetchIndexed($key = NULL) {
+		return $this->fetchPairs($key ? : $this->primary);
+	}
+
 }
