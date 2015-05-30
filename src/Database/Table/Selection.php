@@ -1046,4 +1046,10 @@ class Selection extends Nette\Object implements \Iterator, IRowContainer, \Array
 		return $this->fetchPairs($key ? : $this->primary);
 	}
 
+
+	public function getContext()
+	{
+		return $this->context;
+	}
+
 }
