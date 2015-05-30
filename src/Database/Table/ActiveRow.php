@@ -28,6 +28,12 @@ class ActiveRow implements \IteratorAggregate, IRow
 	/** @var bool */
 	private $dataRefreshed = FALSE;
 
+	/** @var array of new values {@see ActiveRow::update()} */
+	private $modified = array();
+
+	/** @var bool */
+	private $isModified = FALSE;
+
 
 	public function __construct(array $data, Selection $table)
 	{
@@ -170,6 +176,11 @@ class ActiveRow implements \IteratorAggregate, IRow
 		if ($data instanceof \Traversable) {
 			$data = iterator_to_array($data);
 		}
+		if ($data === NULL) {
+			$data = $this->modified;
+		}
+		$this->data = $data + $this->data;
+		$this->modified = $data + $this->modified;
 
 		$primary = $this->getPrimary();
 		if (!is_array($primary)) {
@@ -189,6 +200,7 @@ class ActiveRow implements \IteratorAggregate, IRow
 				throw new Nette\InvalidStateException('Database refetch failed; row does not exist!');
 			}
 			$this->data = $row->data;
+			$this->modified = array();
 			return TRUE;
 		} else {
 			return FALSE;
@@ -274,7 +286,9 @@ class ActiveRow implements \IteratorAggregate, IRow
 
 	public function __set($key, $value)
 	{
-		throw new Nette\DeprecatedException('ActiveRow is read-only; use update() method instead.');
+		trigger_error('Changing properties of ActiveRow is deprecated; use update() instead.', E_USER_DEPRECATED);
+		$this->data[$key] = $value;
+		$this->modified[$key] = $value;
 	}
 
 
@@ -309,7 +323,9 @@ class ActiveRow implements \IteratorAggregate, IRow
 
 	public function __unset($key)
 	{
-		throw new Nette\DeprecatedException('ActiveRow is read-only.');
+		trigger_error('Unsetting properties of ActiveRow is deprecated.', E_USER_DEPRECATED);
+		unset($this->data[$key]);
+		unset($this->modified[$key]);
 	}
 
 
@@ -318,6 +334,10 @@ class ActiveRow implements \IteratorAggregate, IRow
 	 */
 	public function accessColumn($key, $selectColumn = TRUE)
 	{
+		if (isset($this->modified[$key])) {
+			return;
+		}
+
 		$this->table->accessColumn($key, $selectColumn);
 		if ($this->table->getDataRefreshed() && !$this->dataRefreshed) {
 			$this->data = $this->table[$this->getSignature()]->data;
