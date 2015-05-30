@@ -17,6 +17,10 @@ $author->update(array(
 	'name' => 'Tyrion Lannister',
 ));  // UPDATE `author` SET `name`='Tyrion Lannister' WHERE (`id` = 12)
 
+$author = $connection->table('author')->get(12);  // SELECT * FROM `author` WHERE (`id` = ?)
+$author->name = 'Tyrion Lannister';
+$author->update();  // UPDATE `author` SET `name`='Tyrion Lannister' WHERE (`id` = 12)
+
 $book = $context->table('book');
 
 $book1 = $book->get(1);  // SELECT * FROM `book` WHERE (`id` = ?)
@@ -41,6 +45,14 @@ $book2->update(array(
 	'author_id' => $context->table('author')->get(11),  // SELECT * FROM `author` WHERE (`id` = ?)
 ));  // UPDATE `book` SET `author_id`=11 WHERE (`id` = '5')
 
+$book2->author_id = $connection->table('author')->get(12);  // SELECT * FROM `author` WHERE (`id` = ?)
+$book2->update();  // UPDATE `book` SET `author_id`=11 WHERE (`id` = '5')
+
+Assert::same('Tyrion Lannister', $book2->author->name);  // NO SQL, SHOULD BE CACHED
+
+$book2->author_id = $connection->table('author')->get(11);  // SELECT * FROM `author` WHERE (`id` = ?)
+$book2->update();  // UPDATE `book` SET `author_id`=11 WHERE (`id` = '5')
+
 Assert::same('Jakub Vrana', $book2->author->name);  // SELECT * FROM `author` WHERE (`author`.`id` IN (11))
 
 $book2->update(array(
@@ -55,9 +67,8 @@ $tag = $context->table('tag')->insert(array(
 	'name' => 'PC Game',
 ));  // INSERT INTO `tag` (`name`) VALUES ('PC Game')
 
-$tag->update(array(
-	'name' => 'Xbox Game',
-));  // UPDATE `tag` SET `name`='Xbox Game' WHERE (`id` = '24')
+$tag->name = 'Xbox Game';
+$tag->update();  // UPDATE `tag` SET `name`='Xbox Game' WHERE (`id` = '24')
 
 
 $bookTag = $book2->related('book_tag')->insert(array(

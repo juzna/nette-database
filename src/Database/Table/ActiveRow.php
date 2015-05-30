@@ -168,10 +168,10 @@ class ActiveRow implements \IteratorAggregate, IRow
 
 	/**
 	 * Updates row.
-	 * @param  array|\Traversable (column => value)
+	 * @param  array|\Traversable|NULL (column => value)
 	 * @return bool
 	 */
-	public function update($data)
+	public function update($data = NULL)
 	{
 		if ($data instanceof \Traversable) {
 			$data = iterator_to_array($data);
@@ -286,7 +286,6 @@ class ActiveRow implements \IteratorAggregate, IRow
 
 	public function __set($key, $value)
 	{
-		trigger_error('Changing properties of ActiveRow is deprecated; use update() instead.', E_USER_DEPRECATED);
 		$this->data[$key] = $value;
 		$this->modified[$key] = $value;
 	}
@@ -323,7 +322,6 @@ class ActiveRow implements \IteratorAggregate, IRow
 
 	public function __unset($key)
 	{
-		trigger_error('Unsetting properties of ActiveRow is deprecated.', E_USER_DEPRECATED);
 		unset($this->data[$key]);
 		unset($this->modified[$key]);
 	}
